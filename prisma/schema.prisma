@@ -8,11 +8,51 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  imageUrl String
+  id         String      @id @default(uuid())
+  name       String
+  email      String      @unique
+  imageUrl   String
+  Submission Submission?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Team      Team[]
+}
+
+model Game {
+  id   String @id @default(uuid())
+  name String
+  Team Team[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Team {
+  id      String @id @default(uuid())
+  name    String
+  gameId  String
+  ownerId String
+
+  owner User @relation(fields: [ownerId], references: [id])
+  game  Game @relation(fields: [gameId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  players Submission[]
+}
+
+model Submission {
+  id     String @id @default(uuid())
+  status String @default("pending")
+
+  teamId String
+  userId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
