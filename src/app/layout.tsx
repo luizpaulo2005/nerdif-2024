@@ -2,6 +2,7 @@ import { AuthProvider, DataProvider, ThemeProvider } from "@/app/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,10 @@ export default function RootLayout({
       <AuthProvider>
         <DataProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <body className={inter.className}>{children}</body>
+            <body className={inter.className}>
+              <Navbar />
+              {children}
+            </body>
           </ThemeProvider>
         </DataProvider>
       </AuthProvider>
