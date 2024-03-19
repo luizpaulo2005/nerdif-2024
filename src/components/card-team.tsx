@@ -9,6 +9,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Team } from "@/types/team";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { DeleteTeamButton } from "./delete-team-button";
 
 interface TeamCardProps {
   team: Team;
@@ -88,6 +89,7 @@ const TeamCard = (props: TeamCardProps) => {
                 </p>
               );
             })}
+      {team.owner.email === data?.user?.email && <DeleteTeamButton teamId={team.id} />}
     </div>
   );
 };
