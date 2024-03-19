@@ -13,10 +13,10 @@ model User {
   email      String      @unique
   imageUrl   String
   Submission Submission?
+  Team       Team?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Team      Team[]
 }
 
 model Game {
@@ -32,7 +32,7 @@ model Team {
   id      String @id @default(uuid())
   name    String
   gameId  String
-  ownerId String
+  ownerId String @unique
 
   owner User @relation(fields: [ownerId], references: [id])
   game  Game @relation(fields: [gameId], references: [id])
@@ -53,6 +53,6 @@ model Submission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  team Team @relation(fields: [teamId], references: [id])
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])
 }
