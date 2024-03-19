@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 const getTeams = async () => {
   let teams;
@@ -9,7 +10,9 @@ const getTeams = async () => {
       teams = response.data;
     })
     .catch((error) => {
-      console.error(error);
+      toast.error(
+        `Erro ao buscar times: ${error.response.data.message} ${error.response.status}`
+      );
     });
 
   return teams;
