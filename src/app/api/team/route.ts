@@ -15,7 +15,7 @@ const getTeams = async (req: Request) => {
         },
         orderBy: {
           createdAt: "asc",
-        }
+        },
       },
     },
   });
@@ -30,7 +30,6 @@ const getTeams = async (req: Request) => {
 const CreateTeamSchema = z.object({
   name: z.string(),
   gameId: z.string(),
-  ownerId: z.string(),
 });
 
 const createTeam = async (req: Request) => {
@@ -42,35 +41,41 @@ const createTeam = async (req: Request) => {
       where: { email: session.user?.email },
     });
 
-    const { name, ownerId, gameId } = CreateTeamSchema.parse(await req.json());
+    if (user) {
+      const { name, gameId } = CreateTeamSchema.parse(await req.json());
 
-    const team = await prisma.team.create({
-      // @ts-ignore
-      data: {
-        name,
-        gameId,
-        ownerId: user?.id,
-      },
-    });
-
-    if (team) {
-      const submission = await prisma.submission.create({
+      const team = await prisma.team.create({
         // @ts-ignore
         data: {
-          status: "accepted",
-          teamId: team.id,
-          userId: user?.id,
+          name,
+          gameId,
+          ownerId: user?.id,
         },
       });
 
-      if (submission) {
+      if (team) {
+        try {
+          await prisma.submission.create({
+            // @ts-ignore
+            data: {
+              status: "accepted",
+              teamId: team.id,
+              userId: team.ownerId,
+            },
+          });
+        } catch (err) {
+          await prisma.team.delete({
+            where: { id: team.id },
+          });
+          return NextResponse.json(
+            { message: "Error creating team" },
+            { status: 500 }
+          );
+        }
         return NextResponse.json(team, { status: 201 });
-      } else {
-        return NextResponse.json(
-          { message: "Error creating team" },
-          { status: 500 }
-        );
       }
+    } else {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
   } else {
     return NextResponse.json("Unauthenticated", { status: 401 });
