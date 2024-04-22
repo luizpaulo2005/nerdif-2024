@@ -10,6 +10,10 @@ import { Team } from "@/types/team";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { DeleteTeamButton } from "./delete-team-button";
+import { useQuery } from "@tanstack/react-query";
+import { userHasSubmission } from "@/data/submission";
+import { CreateSubmissionButton } from "@/components/create-submission-button";
+import { LeaveTeamButton } from "./leave-team-button";
 
 interface TeamCardProps {
   team: Team;
@@ -18,6 +22,11 @@ interface TeamCardProps {
 const TeamCard = (props: TeamCardProps) => {
   const { team } = props;
   const { data } = useSession();
+
+  const { data: hasSubmissions } = useQuery({
+    queryKey: ["hasSubmissions"],
+    queryFn: () => userHasSubmission(),
+  });
 
   const logos = {
     "League of Legends": LoLLogo,
@@ -89,7 +98,14 @@ const TeamCard = (props: TeamCardProps) => {
                 </p>
               );
             })}
-      {team.owner.email === data?.user?.email && <DeleteTeamButton teamId={team.id} />}
+      {!hasSubmissions && <CreateSubmissionButton team={team} />}
+      {team.owner.email !== data?.user?.email && team.players.find(player => player.user.email === data?.user?.email) && (
+        <LeaveTeamButton team={team} />
+      
+      )}
+      {team.owner.email === data?.user?.email && (
+        <DeleteTeamButton teamId={team.id} />
+      )}
     </div>
   );
 };
