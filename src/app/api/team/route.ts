@@ -39,40 +39,49 @@ const createTeam = async (req: Request) => {
     const user = await prisma.user.findUnique({
       // @ts-ignore
       where: { email: session.user?.email },
+      include: {
+        Team: true,
+        Submission: true,
+      }
     });
 
     if (user) {
       const { name, gameId } = CreateTeamSchema.parse(await req.json());
-
-      const team = await prisma.team.create({
-        // @ts-ignore
-        data: {
-          name,
-          gameId,
-          ownerId: user?.id,
-        },
-      });
-
-      if (team) {
-        try {
-          await prisma.submission.create({
-            // @ts-ignore
-            data: {
-              status: "accepted",
-              teamId: team.id,
-              userId: team.ownerId,
-            },
-          });
-        } catch (err) {
-          await prisma.team.delete({
-            where: { id: team.id },
-          });
+ 
+      // @ts-ignore
+      if (user.Team || user.Submission) {
+        return NextResponse.json({ message: "User already has a team" }, { status: 400 });
+      } else {
+        const team = await prisma.team.create({
+          // @ts-ignore
+          data: {
+            name,
+            gameId,
+            ownerId: user?.id,
+          },
+        });
+  
+        if (team) {
+          try {
+            await prisma.submission.create({
+              data: {
+                status: "accepted",
+                teamId: team.id,
+                userId: team.ownerId,
+              },
+            });
+          } catch (err) {
+            await prisma.team.delete({
+              where: { id: team.id },
+            });
+          }
+          return NextResponse.json(team, { status: 201 });
+        } else {
           return NextResponse.json(
             { message: "Error creating team" },
             { status: 500 }
           );
         }
-        return NextResponse.json(team, { status: 201 });
       }
     } else {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
