@@ -1,9 +1,9 @@
 "use client";
-import CounterStrikeLogo from "@/assets/counter-strike.png";
-import FreeFireLogo from "@/assets/free-fire.png";
-import LoLLogo from "@/assets/league-of-legends.png";
-import ValorantLogo from "@/assets/valorant.png";
-import XadrezLogo from "@/assets/xadrez.png";
+import CounterStrikeLogo from "@/assets/counter-strike-icon.png";
+import FreeFireLogo from "@/assets/free-fire-icon.png";
+import LoLLogo from "@/assets/league-of-legends-icon.png";
+import ValorantLogo from "@/assets/valorant-icon.png";
+import XadrezLogo from "@/assets/xadrez-icon.webp";
 import { PlayerOptions } from "@/components/player-options";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Team } from "@/types/team";
