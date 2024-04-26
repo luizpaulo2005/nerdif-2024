@@ -30,7 +30,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { userHasSubmission } from "@/data/submission";
 
 const CreateTeamSchema = z.object({
   name: z.string().nonempty("O nome do time não pode ser vazio"),
@@ -51,11 +50,6 @@ const statusMessages = {
 const CreateTeamForm = () => {
   const [status, setStatus] = useState<Status>("idle");
 
-  const { data: hasSubmissions } = useQuery({
-    queryKey: ["hasSubmissions"],
-    queryFn: () => userHasSubmission(),
-  });
-
   const {
     control,
     register,
@@ -73,6 +67,7 @@ const CreateTeamForm = () => {
   const handleCreateTeam = async (data: CreateTeamForm) => {
     setStatus("sending");
     toast("Adicionando item...");
+
 
     await axios
       .post("/api/team", data)
@@ -99,9 +94,8 @@ const CreateTeamForm = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button disabled={hasSubmissions} className="flex gap-2 items-center">
+        <Button size="icon">
           <Plus />
-          Criar um time
         </Button>
       </DialogTrigger>
       <DialogContent>
